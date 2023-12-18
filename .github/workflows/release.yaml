@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # disallows two or more release jobs to run in parallel
+    concurrency: release
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Bump version and publish
+        uses: obfu5c8/action-svu
+        id: generate_next_version
+        with:
+          force-increment: true
+
+        run: |
+          git config --global user.name 'Nebius Bot'
+          git config --global user.email 'bot@nebius.com'
+          echo ${{ steps.generate_next_version.outputs.version }}
+#          git tag ${{ steps.generate_next_version.outputs.version }}
+#          git push --tags

@@ -26,6 +26,7 @@ jobs:
         uses: obfu5c8/action-svu
         id: generate_next_version
         with:
+          type: minor
           force-increment: true
 
         run: |
@@ -34,3 +35,5 @@ jobs:
           echo ${{ steps.generate_next_version.outputs.version }}
 #          git tag ${{ steps.generate_next_version.outputs.version }}
 #          git push --tags
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

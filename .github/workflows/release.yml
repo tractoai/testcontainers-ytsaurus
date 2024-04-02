@@ -1,0 +1,27 @@
+name: Bump version
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@v1
+        id: bump
+        env:
+          DEFAULT_BUMP: patch
+          WITH_V: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish go package
+        run: |
+          GOPROXY=proxy.golang.org go list -m github.com/nebius/testcontainers-ytsaurus@${{ steps.bump.outputs.new_tag }}

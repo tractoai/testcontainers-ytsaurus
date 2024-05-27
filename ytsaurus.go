@@ -99,7 +99,7 @@ func RunContainer(ctx context.Context, opts ...testcontainers.ContainerCustomize
 	return &YTsaurusContainer{Container: container}, nil
 }
 
-func getFreePort() (int, error) {
+func getFreePort() (port int, err error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
 	if err != nil {
 		return 0, err
@@ -109,7 +109,11 @@ func getFreePort() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer listener.Close()
+	defer func() {
+		if closeErr := listener.Close(); closeErr != nil {
+			err = fmt.Errorf("close listener: %w", err)
+		}
+	}()
 
 	return listener.Addr().(*net.TCPAddr).Port, nil
 }

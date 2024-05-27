@@ -1,20 +1,28 @@
-package ytcontainer
+package ytsaurus_test
 
 import (
 	"context"
 	"testing"
 
+	ytsaurus "github.com/nebius/testcontainers-ytsaurus"
 	"github.com/stretchr/testify/require"
+	"github.com/testcontainers/testcontainers-go"
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
 )
 
 func TestLocalYtsaurus(t *testing.T) {
-	ytLocal := NewYtsaurusLocal()
-	defer func() { require.NoError(t, ytLocal.Stop()) }()
-	require.NoError(t, ytLocal.Start())
+	ctx := context.Background()
 
-	ytClient, err := ytLocal.GetClient()
+	container, err := ytsaurus.RunContainer(ctx, testcontainers.WithImage("ytsaurus/local:stable"))
+	require.NoError(t, err)
+
+	// Clean up the container after the test is complete
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(ctx))
+	})
+
+	ytClient, err := container.NewClient(ctx)
 	require.NoError(t, err)
 
 	newUserName := "oleg"
@@ -27,12 +35,7 @@ func TestLocalYtsaurus(t *testing.T) {
 
 func getUsers(t *testing.T, client yt.Client) []string {
 	var usernames []string
-	err := client.ListNode(
-		context.Background(),
-		ypath.Path("//sys/users"),
-		&usernames,
-		nil,
-	)
+	err := client.ListNode(context.Background(), ypath.Path("//sys/users"), &usernames, nil)
 	require.NoError(t, err)
 	return usernames
 }

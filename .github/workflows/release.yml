@@ -29,4 +29,4 @@ jobs:
 
       - name: Publish go package
         run: |
-          GOPROXY=proxy.golang.org go list -m github.com/nebius/testcontainers-ytsaurus@${{ steps.bump.outputs.new_tag }}
+          GOPROXY=proxy.golang.org go list -m github.com/${{ github.repository }}@${{ steps.bump.outputs.new_tag }}

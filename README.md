@@ -9,7 +9,7 @@ The Testcontainers module for [YTsaurus](https://ytsaurus.tech/).
 Please run the following command to add the YTsaurus module to your Go dependencies:
 
 ```
-go get github.com/nebius/testcontainers-ytsaurus
+go get github.com/tractoai/testcontainers-ytsaurus
 ```
 
 ## Usage example

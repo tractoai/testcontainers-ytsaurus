@@ -49,13 +49,39 @@ func TestProxy(t *testing.T) {
 	ytClient, err := ythttp.NewClient(&yt.Config{
 		Proxy: proxy,
 		Credentials: &yt.TokenCredentials{
-			Token: container.Token(),
+			Token: ytsaurus.SuperuserToken,
 		},
 	})
 	require.NoError(t, err)
 
 	users := getUsers(t, ytClient)
 	require.NotEmpty(t, users)
+}
+
+func TestUserLogin(t *testing.T) {
+	ctx := context.Background()
+
+	container, err := ytsaurus.RunContainer(ctx)
+	require.NoError(t, err)
+
+	// Clean up the container after the test is complete
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(ctx))
+	})
+
+	ytClient, err := container.NewClient(ctx)
+	require.NoError(t, err)
+
+	newUser := "oleg"
+	createUser(t, ytClient, newUser)
+	token, err := ytClient.IssueToken(ctx, newUser, "", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, token)
+
+	userYtClient, err := container.NewUserClient(ctx, token)
+	require.NoError(t, err)
+	err = userYtClient.RemoveNode(ctx, ypath.Path("//home"), nil)
+	require.Error(t, err)
 }
 
 func getUsers(t *testing.T, client yt.Client) []string {

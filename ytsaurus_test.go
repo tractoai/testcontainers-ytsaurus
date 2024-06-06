@@ -9,7 +9,7 @@ import (
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
 
-	"github.com/tractoai/testcontainers-ytsaurus"
+	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )
 
 func TestLocalYtsaurus(t *testing.T) {

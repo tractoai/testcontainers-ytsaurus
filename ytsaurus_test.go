@@ -8,6 +8,7 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
+	"go.ytsaurus.tech/yt/go/yt/ythttp"
 
 	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )
@@ -32,6 +33,29 @@ func TestLocalYtsaurus(t *testing.T) {
 	createUser(t, ytClient, newUserName)
 	usernamesAfter := getUsers(t, ytClient)
 	require.Contains(t, usernamesAfter, newUserName)
+}
+
+func TestProxy(t *testing.T) {
+	ctx := context.Background()
+	container, err := ytsaurus.RunContainer(ctx)
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(ctx))
+	})
+
+	proxy, err := container.GetProxy(ctx)
+	require.NoError(t, err)
+	ytClient, err := ythttp.NewClient(&yt.Config{
+		Proxy: proxy,
+		Credentials: &yt.TokenCredentials{
+			Token: container.Token(),
+		},
+	})
+	require.NoError(t, err)
+
+	users := getUsers(t, ytClient)
+	require.NotEmpty(t, users)
 }
 
 func getUsers(t *testing.T, client yt.Client) []string {

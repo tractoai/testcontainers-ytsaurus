@@ -36,6 +36,11 @@ func (y *YTsaurusContainer) ConnectionHost(ctx context.Context) (string, error) 
 	return fmt.Sprintf("%s:%s", host, mappedPort.Port()), nil
 }
 
+// GetProxy is an alias for ConnectionHost since `proxy` is more familiar term for in YTsaurus.
+func (y *YTsaurusContainer) GetProxy(ctx context.Context) (string, error) {
+	return y.ConnectionHost(ctx)
+}
+
 // Token returns the token for the YTsaurus container.
 func (y *YTsaurusContainer) Token() string {
 	return "password"

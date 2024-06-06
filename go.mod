@@ -1,4 +1,4 @@
-module github.com/nebius/testcontainers-ytsaurus
+module github.com/tractoai/testcontainers-ytsaurus
 
 go 1.22
 

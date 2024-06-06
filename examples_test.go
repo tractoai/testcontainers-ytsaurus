@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	ytsaurus "github.com/nebius/testcontainers-ytsaurus"
 	"github.com/testcontainers/testcontainers-go"
 	"go.ytsaurus.tech/yt/go/ypath"
+
+	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )
 
 func ExampleRunContainer() {

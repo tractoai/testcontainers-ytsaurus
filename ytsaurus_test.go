@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
-	ytsaurus "github.com/nebius/testcontainers-ytsaurus"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
+
+	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )
 
 func TestLocalYtsaurus(t *testing.T) {

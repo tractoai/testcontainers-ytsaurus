@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	defaultImage  = "ytsaurus/local:stable"
-	containerPort = "80/tcp"
+	defaultImage   = "ytsaurus/local:stable"
+	containerPort  = "80/tcp"
+	SuperuserToken = "password"
 )
 
 // YTsaurusContainer represents the YTsaurus container type used in the module.
@@ -41,13 +42,13 @@ func (y *YTsaurusContainer) GetProxy(ctx context.Context) (string, error) {
 	return y.ConnectionHost(ctx)
 }
 
-// Token returns the token for the YTsaurus container.
-func (y *YTsaurusContainer) Token() string {
-	return "password"
+// NewClient creates a new YT client logged-in as a superuser.
+func (y *YTsaurusContainer) NewClient(ctx context.Context) (yt.Client, error) {
+	return y.NewUserClient(ctx, SuperuserToken)
 }
 
-// NewClient creates a new YT client connected to the YTsaurus container.
-func (y *YTsaurusContainer) NewClient(ctx context.Context) (yt.Client, error) {
+// NewUserClient creates a new YT client connected to the YTsaurus container.
+func (y *YTsaurusContainer) NewUserClient(ctx context.Context, token string) (yt.Client, error) {
 	host, err := y.ConnectionHost(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get connection host: %w", err)
@@ -56,7 +57,7 @@ func (y *YTsaurusContainer) NewClient(ctx context.Context) (yt.Client, error) {
 	client, err := ythttp.NewClient(&yt.Config{
 		Proxy: host,
 		Credentials: &yt.TokenCredentials{
-			Token: y.Token(),
+			Token: token,
 		},
 	})
 	if err != nil {

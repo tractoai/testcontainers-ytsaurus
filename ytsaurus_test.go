@@ -52,6 +52,7 @@ func TestProxy(t *testing.T) {
 			Token: container.Token(),
 		},
 	})
+	require.NoError(t, err)
 
 	users := getUsers(t, ytClient)
 	require.NotEmpty(t, users)

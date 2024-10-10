@@ -2,8 +2,9 @@ package ytsaurus_test
 
 import (
 	"context"
-	"go.ytsaurus.tech/yt/go/yterrors"
 	"testing"
+
+	"go.ytsaurus.tech/yt/go/yterrors"
 
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"

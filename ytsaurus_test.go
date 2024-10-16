@@ -4,13 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"go.ytsaurus.tech/yt/go/yterrors"
-
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
 	"go.ytsaurus.tech/yt/go/yt/ythttp"
+	"go.ytsaurus.tech/yt/go/yterrors"
 
 	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )

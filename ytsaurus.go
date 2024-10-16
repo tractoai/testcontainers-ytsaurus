@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	defaultImage  = "ghcr.io/ytsaurus/local:stable"
-	containerPort = "80/tcp"
+	defaultImage    = "ghcr.io/ytsaurus/local:stable"
+	containerPort   = "80/tcp"
+	DefaultUser     = "admin"
+	DefaultPassword = "password"
+	DefaultToken    = "password"
 )
 
 // YTsaurusContainer represents the YTsaurus container type used in the module.

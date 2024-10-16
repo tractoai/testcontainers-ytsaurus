@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	defaultImage  = "ytsaurus/local:stable"
-	containerPort = "80/tcp"
+	defaultImage    = "ghcr.io/ytsaurus/local-nightly:dev-2024-10-16-50e2ea53cfec3c9973e5b065f839e05a73506945"
+	containerPort   = "80/tcp"
+	DefaultUser     = "admin"
+	DefaultPassword = "password"
+	DefaultToken    = "password"
 )
 
 // YTsaurusContainer represents the YTsaurus container type used in the module.
@@ -63,6 +66,19 @@ func (y *YTsaurusContainer) NewClient(ctx context.Context) (yt.Client, error) {
 		return nil, fmt.Errorf("create YT client: %w", err)
 	}
 	return client, nil
+}
+
+// WithAuth enables authentication on http proxies and creates `admin` user with password and token `password`.
+func WithAuth() testcontainers.CustomizeRequestOption {
+	return func(req *testcontainers.GenericContainerRequest) error {
+		req.Cmd = append(
+			req.Cmd,
+			"--native-client-supported", // required by yt_python for auth setup
+			"--enable-auth",
+			"--create-admin-user",
+		)
+		return nil
+	}
 }
 
 // RunContainer creates and starts an instance of the YTsaurus container.

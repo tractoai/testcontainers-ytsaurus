@@ -9,6 +9,7 @@ import (
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
 	"go.ytsaurus.tech/yt/go/yt/ythttp"
+	"go.ytsaurus.tech/yt/go/yterrors"
 
 	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
 )
@@ -56,6 +57,43 @@ func TestProxy(t *testing.T) {
 
 	users := getUsers(t, ytClient)
 	require.NotEmpty(t, users)
+}
+
+func TestLocalYtsaurusWithAuth(t *testing.T) {
+	ctx := context.Background()
+	container, err := ytsaurus.RunContainer(ctx, ytsaurus.WithAuth())
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(ctx))
+	})
+
+	proxy, err := container.GetProxy(ctx)
+	require.NoError(t, err)
+
+	ytClient, err := ythttp.NewClient(&yt.Config{
+		Proxy: proxy,
+		Credentials: &yt.TokenCredentials{
+			Token: container.Token(),
+		},
+	})
+	require.NoError(t, err)
+
+	var rootMapNode []string
+	err = ytClient.ListNode(ctx, ypath.Path("/"), &rootMapNode, nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, rootMapNode)
+
+	crookedYtClient, err := ythttp.NewClient(&yt.Config{
+		Proxy: proxy,
+		Credentials: &yt.TokenCredentials{
+			Token: "not-a-valid-token",
+		},
+	})
+	require.NoError(t, err)
+
+	err = crookedYtClient.ListNode(ctx, ypath.Path("/"), &rootMapNode, nil)
+	require.True(t, yterrors.ContainsErrorCode(err, yterrors.CodeAuthenticationError))
 }
 
 func getUsers(t *testing.T, client yt.Client) []string {

@@ -12,11 +12,12 @@ import (
 )
 
 const (
-	defaultImage    = "ghcr.io/ytsaurus/local-nightly:dev-2024-10-16-50e2ea53cfec3c9973e5b065f839e05a73506945"
-	containerPort   = "80/tcp"
-	DefaultUser     = "admin"
-	DefaultPassword = "password"
-	DefaultToken    = "password"
+	defaultImage     = "ghcr.io/ytsaurus/local-nightly:dev-2024-10-16-50e2ea53cfec3c9973e5b065f839e05a73506945"
+	containerPort    = "80/tcp"
+	containerRPCPort = "8002/tcp"
+	DefaultUser      = "admin"
+	DefaultPassword  = "password"
+	DefaultToken     = "password"
 )
 
 // YTsaurusContainer represents the YTsaurus container type used in the module.
@@ -76,6 +77,22 @@ func WithAuth() testcontainers.CustomizeRequestOption {
 			"--native-client-supported", // required by yt_python for auth setup
 			"--enable-auth",
 			"--create-admin-user",
+		)
+		return nil
+	}
+}
+
+func WithRPCProxy() testcontainers.CustomizeRequestOption {
+	return func(req *testcontainers.GenericContainerRequest) error {
+		randomPort, err := getFreePort()
+		if err != nil {
+			return fmt.Errorf("get random free port: %w", err)
+		}
+
+		req.Cmd = append(
+			req.Cmd,
+			"--rpc-proxy-count", "1",
+			"--rpc-proxy-port", fmt.Sprintf("%d", randomPort),
 		)
 		return nil
 	}

@@ -81,6 +81,23 @@ func WithAuth() testcontainers.CustomizeRequestOption {
 	}
 }
 
+func WithRPCProxy() testcontainers.CustomizeRequestOption {
+	return func(req *testcontainers.GenericContainerRequest) error {
+		randomPort, err := getFreePort()
+		if err != nil {
+			return fmt.Errorf("get random free port: %w", err)
+		}
+
+		req.Cmd = append(
+			req.Cmd,
+			"--rpc-proxy-count", "1",
+			"--rpc-proxy-port", fmt.Sprintf("%d", randomPort),
+		)
+		req.ExposedPorts = append(req.ExposedPorts, fmt.Sprintf("%d:%d", randomPort, randomPort))
+		return nil
+	}
+}
+
 // RunContainer creates and starts an instance of the YTsaurus container.
 func RunContainer(ctx context.Context, opts ...testcontainers.ContainerCustomizer) (*YTsaurusContainer, error) {
 	randomPort, err := getFreePort()

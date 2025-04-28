@@ -9,6 +9,7 @@ import (
 	"go.ytsaurus.tech/yt/go/ypath"
 	"go.ytsaurus.tech/yt/go/yt"
 	"go.ytsaurus.tech/yt/go/yt/ythttp"
+	"go.ytsaurus.tech/yt/go/yt/ytrpc"
 	"go.ytsaurus.tech/yt/go/yterrors"
 
 	ytsaurus "github.com/tractoai/testcontainers-ytsaurus"
@@ -56,6 +57,30 @@ func TestProxy(t *testing.T) {
 	require.NoError(t, err)
 
 	users := getUsers(t, ytClient)
+	require.NotEmpty(t, users)
+}
+
+func TestRPCProxy(t *testing.T) {
+	ctx := context.Background()
+	container, err := ytsaurus.RunContainer(ctx, ytsaurus.WithRPCProxy())
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, container.Terminate(ctx))
+	})
+
+	proxy, err := container.GetProxy(ctx)
+	require.NoError(t, err)
+
+	rpcClient, err := ytrpc.NewClient(&yt.Config{
+		Proxy: proxy,
+		Credentials: &yt.TokenCredentials{
+			Token: container.Token(),
+		},
+	})
+	require.NoError(t, err)
+
+	users := getUsers(t, rpcClient)
 	require.NotEmpty(t, users)
 }
 

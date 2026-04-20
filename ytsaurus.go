@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"path/filepath"
 
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.ytsaurus.tech/yt/go/yt"
@@ -17,6 +20,10 @@ const (
 	DefaultUser     = "admin"
 	DefaultPassword = "password"
 	DefaultToken    = "password"
+
+	// localCypressMountPath is where the YTsaurus docker image expects
+	// the host-provided local cypress tree to be mounted (see yt/docker/local/start.sh).
+	localCypressMountPath = "/var/lib/yt/local-cypress"
 )
 
 // YTsaurusContainer represents the YTsaurus container type used in the module.
@@ -77,6 +84,38 @@ func WithAuth() testcontainers.CustomizeRequestOption {
 			"--enable-auth",
 			"--create-admin-user",
 		)
+		return nil
+	}
+}
+
+// WithLocalCypressDir bind-mounts hostPath into the container at the path the
+// YTsaurus image expects (/var/lib/yt/local-cypress) so that files there are
+// imported into Cypress on startup. Also enables --wait-tablet-cell-initialization
+// so dynamic tables in the tree can be mounted and populated.
+//
+// See yt/python/yt/environment/local_cypress.py for the format of the tree
+// (file + .meta sibling; subdirectories with .meta become map_nodes).
+func WithLocalCypressDir(hostPath string) testcontainers.CustomizeRequestOption {
+	return func(req *testcontainers.GenericContainerRequest) error {
+		absPath, err := filepath.Abs(hostPath)
+		if err != nil {
+			return fmt.Errorf("resolve local cypress dir %q: %w", hostPath, err)
+		}
+
+		prev := req.HostConfigModifier
+		req.HostConfigModifier = func(hc *container.HostConfig) {
+			if prev != nil {
+				prev(hc)
+			}
+			hc.Mounts = append(hc.Mounts, mount.Mount{
+				Type:     mount.TypeBind,
+				Source:   absPath,
+				Target:   localCypressMountPath,
+				ReadOnly: true,
+			})
+		}
+
+		req.Cmd = append(req.Cmd, "--wait-tablet-cell-initialization")
 		return nil
 	}
 }

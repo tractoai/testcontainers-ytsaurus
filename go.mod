@@ -3,6 +3,7 @@ module github.com/tractoai/testcontainers-ytsaurus
 go 1.22
 
 require (
+	github.com/docker/docker v26.1.2+incompatible
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	go.ytsaurus.tech/yt/go v0.0.17
@@ -20,7 +21,6 @@ require (
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
-	github.com/docker/docker v26.1.2+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect

@@ -42,7 +42,7 @@ func TestLocalCypressDynamicTable(t *testing.T) {
 	dyn := true
 	require.NoError(t, client.AlterTable(ctx, tablePath, &yt.AlterTableOptions{Dynamic: &dyn}))
 	require.NoError(t, client.MountTable(ctx, tablePath, nil))
-	waitTabletState(t, ctx, client, tablePath, "mounted")
+	waitTabletState(ctx, t, client, tablePath, "mounted")
 
 	var isDynamic bool
 	require.NoError(t, client.GetNode(ctx, tablePath.Attr("dynamic"), &isDynamic, nil))
@@ -96,7 +96,7 @@ func TestLocalCypressDynamicTable(t *testing.T) {
 	t.Logf("lookup_rows(//dyn_table, key=2): %+v", looked)
 }
 
-func waitTabletState(t *testing.T, ctx context.Context, client yt.Client, path ypath.Path, want string) {
+func waitTabletState(ctx context.Context, t *testing.T, client yt.Client, path ypath.Path, want string) {
 	t.Helper()
 	deadline := time.Now().Add(30 * time.Second)
 	for {

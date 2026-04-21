@@ -1,0 +1,18 @@
+{
+    "type" = "table";
+    "attributes" = {
+        "schema" = <"unique_keys" = %true;> [
+            {
+                "name" = "key";
+                "type" = "int64";
+                "sort_order" = "ascending";
+            };
+            {
+                "name" = "value";
+                "type" = "string";
+            };
+        ];
+        "myattr" = 7;
+    };
+    "format" = "yson";
+}
